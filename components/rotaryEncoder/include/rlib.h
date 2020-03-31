@@ -7,6 +7,18 @@
 
 /*
 
+   static values needed for functions
+   
+*/
+static const int8_t STATUS_BUTTON_CLICKED_BIT = 2;
+static const int8_t STATUS_BUTTON_PRESSED_BIT = 1;
+static const int8_t STATUS_ENCODER_MOVED_BIT = 0;
+
+static const int8_t ENABLE_INTERRUPT_BUTTON_BIT = 1;
+static const int8_t ENABLE_INTERRUPT_ENCODER_BIT = 0;
+
+/*
+
    Function prototypes
    
 */
@@ -40,7 +52,7 @@ int16_t rlib_get_green_connect();
 int16_t rlib_get_blue_connect();
 
 bool rlib_set_limit(uint16_t val);                                      /* Set the limit of what the encoder will go to, then wrap to 0. Set to 0 to disable. */
-uint16_t rlib_get_limit();                                              /* Get the limit of what the encoder will go to */
+uint16_t rlib_get_limit();                                              /* Get the limit of what the encoder will go */
 
 uint16_t rlib_get_int_timeout();                                        /* Get number of milliseconds that must elapse between end of knob turning and interrupt firing */
 bool rlib_set_int_timeout(uint16_t timeout);                            /* Set number of milliseconds that elapse between end of knob turning and interrupt firing */
