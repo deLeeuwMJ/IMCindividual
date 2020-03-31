@@ -2,11 +2,17 @@
 
 #define TAG "ROTARY_LED"
 
-/* Current led state of the LED */
-led_state_t led_state;
+led_state_t led_state;  
+main_handler_t* ptr_main_handler;
 
-/* Init default re state and also starts related tasks*/
-void roled_start_tasks(main_handler_t* audio_handler)
+/* Init handler */
+void roled_init(main_handler_t* main_handler)
+{
+    ptr_main_handler = main_handler;
+}
+
+/*  starts related tasks*/
+void roled_start_tasks()
 {
     /* Led state */
     led_state = LED_ON;
@@ -17,7 +23,7 @@ void roled_start_tasks(main_handler_t* audio_handler)
         /* Disable change led on rotation */
         rlib_connect_color(0x00, 0x00, 0x00);
         
-        xTaskCreate(roled_on_off_handler_task, "on_off_led_handler_task", 896, (void*)audio_handler->mutex, 2, NULL);
+        xTaskCreate(roled_on_off_handler_task, "on_off_led_handler_task", 896, (void*)ptr_main_handler->mutex, 2, NULL);
     }
 }
 

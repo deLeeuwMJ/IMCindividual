@@ -11,11 +11,12 @@ void app_main()
     main_handler_init(&main_config);
     input_button_init(&main_config);
     input_mutex_init(&main_config);
-    radio_init(&main_config);
     input_rotary_init(&main_config);
+    radio_init(&main_config);
+    roled_init(&main_config);
 
     /* Start all task related to Rotary Encoder RGB Light */
-    roled_start_tasks(&main_config);
+    roled_start_tasks();
 
     /* Start radio */
     radio_start();
