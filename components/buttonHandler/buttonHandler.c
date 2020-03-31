@@ -9,22 +9,17 @@
 #include "esp_log.h"
 #include "board.h"
 #include "input_key_service.h"
-#include "menu.h"
 #include "buttonHandler.h"
 #include "rlib.h"
 #include "twistre.h"
-#include "clockHandler.h"
-#include "sdcardrw.h"
 #include "radio.h"
 
 #define TAG "BUTTON_HANDLER"
-#define FILEPATH "MEMO_PATH"
 
 twistre_t twistre;
 SemaphoreHandle_t* mutex;
-char* filepath;
 
-/* Callback when a button on the lyraT board is pressed */
+//* I didn't wrote this function *//
 static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_service_event_t *evt, void *ctx)
 {
      if (evt->type == INPUT_KEY_SERVICE_ACTION_CLICK) 
@@ -35,17 +30,13 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
         switch ((int)evt->data) 
         {
             case 1:             //rec bttn
-                ESP_LOGI(TAG, "[ * ] REC BUTTON PRESSED");
-                ESP_LOGI(FILEPATH, "%s", filepath);
-                xTaskCreate(sdcardrw_record_memo, "memo_recorder_handler", 3*1024, (void*)filepath, 1, NULL);
+                ESP_LOGI(TAG, "[ * ] SET BUTTON PRESSED");
                 break;
             case 2:             //set bttn
                 ESP_LOGI(TAG, "[ * ] SET BUTTON PRESSED");
-                menu_settings_selected();
                 break;
             case 3:             //play bttn
                 ESP_LOGI(TAG, "[ * ] PLAY BUTTON PRESSED");
-                clockHandler_say_time();
                 break;     
             case 4:           //mode bttn
                 ESP_LOGI(TAG, "[ * ] MODE BUTTON PRESSED");
@@ -70,7 +61,7 @@ void input_mutex_init(main_handler_t* main_handler)
     mutex = &main_handler->mutex;
 }
 
-/* Initializes the button handler */
+//* I didn't wrote this function *//
 void buttonHandler_init(main_handler_t* main_handler)
 {
     ESP_LOGI(TAG, "button_init called");
@@ -117,29 +108,15 @@ void twistre_scroll_handler(void* pvParameters)
         switch (state)
         {
         case TWIST_LESS:
-            (int) menu_get_menu_pointer_state() == 0 ? radio_previous_channel() : menu_scroll_down();
+            radio_previous_channel();
             break;
         case TWIST_GREATER:
-            (int) menu_get_menu_pointer_state() == 0 ? radio_next_channel() : menu_scroll_up();
+            radio_next_channel();
             break;
         default:
             /* TWIST_EQUAL */
             break;
         }
-
-        // /* SD CARD FILE NAME CODE */
-
-        //init result
-        char result[70];
-
-        //get time and date
-        simple_time current_time = clockHandler_getTime();
-        simple_date current_date = clockHandler_getDate();
-
-        //set format to DDMMHHMM.wav (more info isn't possible)
-        snprintf(result, sizeof( result ), "%s%02d%02d%02d%02d%s", "/sdcard/M/", current_date.day, current_date.month, current_time.hours, current_time.minutes, ".wav");
-
-        filepath = result;
 
 	    xSemaphoreGive(*mutex);
     }

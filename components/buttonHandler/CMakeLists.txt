@@ -2,6 +2,6 @@
 
 set(COMPONENT_ADD_INCLUDEDIRS include)
 set(COMPONENT_SRCS "buttonHandler.c")
-set(COMPONENT_PRIV_REQUIRES "menu" "rotaryEncoder" "mainHandler" "radio" "sdcardrw" esp_peripherals clockHandler input_key_service)
+set(COMPONENT_PRIV_REQUIRES "rotaryEncoder" "mainHandler" "radio" esp_peripherals clockHandler input_key_service)
 
 register_component()

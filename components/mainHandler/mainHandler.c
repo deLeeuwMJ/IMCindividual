@@ -71,18 +71,8 @@ void mainHandler_init_semaphore(main_handler_t * main_handler)
 /* Initializes the main configurations */
 void mainHandler_init_config(main_handler_t* main_handler)
 {
-    simple_time powertime = // Hours, Minutes, Seconds
-    {
-        20, 3, 0
-    };
-
-    simple_time alarmtime = // Hours, Minutes, Seconds
-    {
-        20, 5, 0
-    };
-
-    config_handler_t config = { // Device vol, default radio channel, voice, time alarm goes off, time light turns off
-        45, 3, VOICE_MALE, alarmtime, powertime
+    config_handler_t config = { // Device vol, default radio channel
+        45, 3
     };
 
     main_handler->config = config;

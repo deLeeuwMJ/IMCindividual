@@ -30,7 +30,5 @@ typedef struct
 
 void start_led_tasks(main_handler_t* audio_handler);
 void led_default_state(void* pvParameters);
-void led_sunrise_event_handler(void* pvParameters);
-void led_power_event_handler(void* pvParameters);
 void led_on_off_handler(void* pvParameters);
 #endif
