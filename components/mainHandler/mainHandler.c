@@ -1,29 +1,20 @@
 #include "mainHandler.h"
-#include "esp_log.h"
-#include <string.h>
 #include "nvs_flash.h"
 
 #define TAG "MAIN_HANDLER"
 
-// Prototypes
-void mainHandler_init_board(main_handler_t * main_handler);
-void mainHandler_init_wifi(main_handler_t * main_handler);
-void mainHandler_init_semaphore(main_handler_t * main_handler);
-void mainHandler_init_config(main_handler_t* main_handler);
-void nvs_init();
-
-/* Initializes the main settings */
-void mainHandler_init(main_handler_t * main_handler)
+//* I didn't write this function *//
+void main_handler_init(main_handler_t * main_handler)
 {
-    nvs_init();
-    mainHandler_init_board(main_handler);
-    mainHandler_init_wifi(main_handler);
-    mainHandler_init_semaphore(main_handler);
-    mainHandler_init_config(main_handler);
+    main_handler_init_nvs_init();
+    main_handler_init_board(main_handler);
+    main_handler_init_wifi(main_handler);
+    main_handler_init_semaphore(main_handler);
+    main_handler_init_config(main_handler);
 }
 
-/* Initializes the audio board, esp peripherals, sdcard and keys */ 
-void mainHandler_init_board(main_handler_t * main_handler)
+//* I didn't write this function *//
+void main_handler_init_board(main_handler_t * main_handler)
 {
     ESP_LOGI(TAG, "[1.0] Initialize peripherals management");
     esp_periph_config_t periph_cfg = DEFAULT_ESP_PERIPH_SET_CONFIG();
@@ -31,15 +22,14 @@ void mainHandler_init_board(main_handler_t * main_handler)
 
     ESP_LOGI(TAG, "[1.2] Initialize and start peripherals");
     audio_board_key_init(main_handler->set);
-    audio_board_sdcard_init(main_handler->set);
 
     ESP_LOGI(TAG, "[ 2 ] Start codec chip");
     main_handler->board_handle = audio_board_init();
     audio_hal_ctrl_codec(main_handler->board_handle->audio_hal, AUDIO_HAL_CODEC_MODE_DECODE, AUDIO_HAL_CTRL_START);
 }
 
-/* Initializes and logs onto the current network */
-void mainHandler_init_wifi(main_handler_t * main_handler)
+//* I didn't write this function *//
+void main_handler_init_wifi(main_handler_t * main_handler)
 {
     ESP_LOGI(TAG, "[ 1 ] Initialize the tcp/ip adapter");
     tcpip_adapter_init();
@@ -63,33 +53,24 @@ void mainHandler_init_wifi(main_handler_t * main_handler)
 }
 
 /* Creates a semaphore to make sure main_handler doesnt get written to at the same time from 2 sources */
-void mainHandler_init_semaphore(main_handler_t * main_handler)
+void main_handler_init_semaphore(main_handler_t * main_handler)
 {
     main_handler->mutex = xSemaphoreCreateMutex();
 }
 
 /* Initializes the main configurations */
-void mainHandler_init_config(main_handler_t* main_handler)
+void main_handler_init_config(main_handler_t* main_handler)
 {
-    simple_time powertime = // Hours, Minutes, Seconds
-    {
-        20, 3, 0
-    };
-
-    simple_time alarmtime = // Hours, Minutes, Seconds
-    {
-        20, 5, 0
-    };
-
-    config_handler_t config = { // Device vol, default radio channel, voice, time alarm goes off, time light turns off
-        45, 3, VOICE_MALE, alarmtime, powertime
+    /*Order: device vol, default radio channel */
+    config_handler_t config = { 
+        55, 0
     };
 
     main_handler->config = config;
 }
 
-/* Starts the flash init, needed for wifi */
-void nvs_init()
+//* I didn't write this function *//
+void main_handler_init_nvs_init()
 {
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) 

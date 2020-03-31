@@ -7,4 +7,4 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 
 
-project(lcd_example)
+project(snooze)

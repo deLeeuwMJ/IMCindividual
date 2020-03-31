@@ -2,5 +2,5 @@
 
 set(COMPONENT_ADD_INCLUDEDIRS include)
 set(COMPONENT_SRCS "radio.c")
-set(COMPONENT_PRIV_REQUIRES "menu" nvs_flash audio_pipeline mainHandler audio_stream esp_peripherals)
+set(COMPONENT_PRIV_REQUIRES nvs_flash audio_pipeline mainHandler audio_stream esp_peripherals)
 register_component()

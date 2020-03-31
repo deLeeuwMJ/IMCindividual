@@ -1,14 +1,8 @@
+#ifndef TWIST_RE_H
+#define TWIST_RE_H
 
-#ifndef MCP_PLUS_H
-#define MCP_PLUS_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "esp_err.h"
 #include "driver/i2c.h"
-#include "freertos/task.h"
+#include "esp_log.h"
 
 /* Map to the various registers on the Twist */
 typedef enum 
@@ -107,9 +101,5 @@ twist_err_t twistre_read_register16(twistre_t *re, encoder_registers_t reg, uint
 bool twistre_write_register(twistre_t *re, encoder_registers_t reg, uint8_t data);
 bool twistre_write_register16(twistre_t *re, encoder_registers_t reg, uint16_t data);
 bool twistre_write_register24(twistre_t *re, encoder_registers_t reg, uint32_t data);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

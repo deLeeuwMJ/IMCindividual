@@ -1,30 +1,11 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "board.h"
-#include "input_key_service.h"
-#include "menu.h"
-#include "buttonHandler.h"
-#include "rlib.h"
-#include "twistre.h"
-#include "clockHandler.h"
-#include "sdcardrw.h"
-#include "radio.h"
+#include "inputHandler.h"
 
-#define TAG "BUTTON_HANDLER"
-#define FILEPATH "MEMO_PATH"
+#define TAG "INPUT_HANDLER"
 
-twistre_t twistre;
+twistre_t twistre; /* This needs to be a global variable otherwise the program will crash or create a I2C number error */
 SemaphoreHandle_t* mutex;
-char* filepath;
 
-/* Callback when a button on the lyraT board is pressed */
+//* I didn't write this function *//
 static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_service_event_t *evt, void *ctx)
 {
      if (evt->type == INPUT_KEY_SERVICE_ACTION_CLICK) 
@@ -35,29 +16,24 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
         switch ((int)evt->data) 
         {
             case 1:             //rec bttn
-                ESP_LOGI(TAG, "[ * ] REC BUTTON PRESSED");
-                ESP_LOGI(FILEPATH, "%s", filepath);
-                xTaskCreate(sdcardrw_record_memo, "memo_recorder_handler", 3*1024, (void*)filepath, 1, NULL);
+                ESP_LOGI(TAG, "[ * ] SET BUTTON PRESSED");
                 break;
             case 2:             //set bttn
                 ESP_LOGI(TAG, "[ * ] SET BUTTON PRESSED");
-                menu_settings_selected();
                 break;
             case 3:             //play bttn
                 ESP_LOGI(TAG, "[ * ] PLAY BUTTON PRESSED");
-                clockHandler_say_time();
                 break;     
             case 4:           //mode bttn
                 ESP_LOGI(TAG, "[ * ] MODE BUTTON PRESSED");
-                menu_next();
                 break;   
             case 5:             //vol down
                 ESP_LOGI(TAG, "[ * ] VOL DOWN PRESSED");
-                radio_set_player_volume(-5);
+                radio_set_player_volume(RADIO_DOWN);
                 break;
             case 6:             //vol up
                 ESP_LOGI(TAG, "[ * ] VOL UP PRESSED");
-                radio_set_player_volume(5);
+                radio_set_player_volume(RADIO_UP);
                 break;
             }
         xSemaphoreGive(*mutex);
@@ -65,13 +41,14 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
     return ESP_OK;
 }
 
+/* Initializes main mutex used to prevent errors pressing multiple buttons */
 void input_mutex_init(main_handler_t* main_handler)
 {
     mutex = &main_handler->mutex;
 }
 
-/* Initializes the button handler */
-void buttonHandler_init(main_handler_t* main_handler)
+//* I didn't write this function *//
+void input_button_init(main_handler_t* main_handler)
 {
     ESP_LOGI(TAG, "button_init called");
     input_key_service_info_t input_key_info[] = INPUT_KEY_DEFAULT_INFO();
@@ -81,9 +58,9 @@ void buttonHandler_init(main_handler_t* main_handler)
 }
 
 /* Initializes the Rotary Encoder */
-void rotary_init(main_handler_t* main_handler)
+void input_rotary_init(main_handler_t* main_handler)
 {
-    /* Initialize I2C bus for TWIST RE */
+    /* Initialize config values for TWIST RE */
 	twistre.i2c_addr = QWIIC_TWIST_ADDR;
 	twistre.sda_pin = 18;
 	twistre.scl_pin = 23;
@@ -91,23 +68,24 @@ void rotary_init(main_handler_t* main_handler)
 	twistre.sda_pullup_en = GPIO_PULLUP_ENABLE;
 	twistre.scl_pullup_en = GPIO_PULLUP_ENABLE;
 
-	/* init rotary encoder */
+	/* Init rotary encoder */
 	rlib_init(&twistre);
 
     /* start tasks and check if device is connected */
     if (rlib_is_connected() == true)
     {
-        xTaskCreate(twistre_scroll_handler, "twistre_scroll_handler", 3*1024, NULL, 3, NULL);
+        xTaskCreate(input_twistre_scroll_handler_task, "twistre_scroll_handler_task", 3*1024, NULL, 3, NULL);
     }
 }
 
-/* Task which constantly checks the state of the rotary encoder and acts based on values */
-void twistre_scroll_handler(void* pvParameters)
+/* Task which constantly checks the state of the rotary encoder and acts based off the state */
+void input_twistre_scroll_handler_task(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
-     
-    while (1) {
-        xLastWakeTime = xTaskGetTickCount();
+    xLastWakeTime = xTaskGetTickCount();
+
+    while (true) 
+    {
         vTaskDelayUntil(&xLastWakeTime, 250 / portTICK_RATE_MS);
 
         xSemaphoreTake(*mutex, ( TickType_t ) portMAX_DELAY );
@@ -117,31 +95,16 @@ void twistre_scroll_handler(void* pvParameters)
         switch (state)
         {
         case TWIST_LESS:
-            (int) menu_get_menu_pointer_state() == 0 ? radio_previous_channel() : menu_scroll_down();
+            radio_previous_channel();
             break;
         case TWIST_GREATER:
-            (int) menu_get_menu_pointer_state() == 0 ? radio_next_channel() : menu_scroll_up();
+            radio_next_channel();
             break;
         default:
             /* TWIST_EQUAL */
             break;
         }
 
-        // /* SD CARD FILE NAME CODE */
-
-        //init result
-        char result[70];
-
-        //get time and date
-        simple_time current_time = clockHandler_getTime();
-        simple_date current_date = clockHandler_getDate();
-
-        //set format to DDMMHHMM.wav (more info isn't possible)
-        snprintf(result, sizeof( result ), "%s%02d%02d%02d%02d%s", "/sdcard/M/", current_date.day, current_date.month, current_time.hours, current_time.minutes, ".wav");
-
-        filepath = result;
-
 	    xSemaphoreGive(*mutex);
     }
-    vTaskDelete(NULL);
 }
