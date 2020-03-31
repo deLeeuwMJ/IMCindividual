@@ -21,7 +21,7 @@ void roled_start_tasks(main_handler_t* audio_handler)
     }
 }
 
-/* This task handles if the led on the  */
+/* This task handles on and off state LED colors */
 void roled_on_off_handler_task(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
@@ -32,15 +32,15 @@ void roled_on_off_handler_task(void* pvParameters)
         vTaskDelayUntil(&xLastWakeTime, 1000 / portTICK_RATE_MS);
 
         xSemaphoreTake((SemaphoreHandle_t) pvParameters, portMAX_DELAY );
-
+        
         if (led_state == LED_ON)
         {
-            /* Blue color */
+            /* Set blue color */
             rlib_set_color(0x00, 0xD4, 0xFF);
         }
         else if (led_state == LED_OFF)
         {
-            /* Black color */
+            /* Set black color */
             rlib_set_color(0x00, 0x00, 0x00);
         }
         

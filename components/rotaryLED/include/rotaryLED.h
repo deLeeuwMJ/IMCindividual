@@ -16,18 +16,6 @@ typedef enum
 } led_state_t;
 
 /*
-   rgb_info_t
-   
-   Contains info RGB
-*/
-typedef struct 
-{
-   uint8_t red;
-   uint8_t green;
-   uint8_t blue;
-} rgb_info_t;
-
-/*
 
    Function prototypes
    
