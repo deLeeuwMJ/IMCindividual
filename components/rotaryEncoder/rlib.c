@@ -1,8 +1,3 @@
-#include "stdbool.h"
-#include "esp_err.h"
-#include "driver/i2c.h"
-#include "freertos/task.h"
-#include "twistre.h"
 #include "rlib.h"
 
 const int8_t STATUS_BUTTON_CLICKED_BIT = 2;

@@ -1,11 +1,9 @@
 #include "mainHandler.h"
-#include "esp_log.h"
-#include <string.h>
 #include "nvs_flash.h"
 
 #define TAG "MAIN_HANDLER"
 
-/* Initializes the main settings */
+//* I didn't write this function *//
 void mainHandler_init(main_handler_t * main_handler)
 {
     nvs_init();
@@ -15,7 +13,7 @@ void mainHandler_init(main_handler_t * main_handler)
     mainHandler_init_config(main_handler);
 }
 
-/* Initializes the audio board, esp peripherals, sdcard and keys */ 
+//* I didn't write this function *//
 void mainHandler_init_board(main_handler_t * main_handler)
 {
     ESP_LOGI(TAG, "[1.0] Initialize peripherals management");
@@ -30,7 +28,7 @@ void mainHandler_init_board(main_handler_t * main_handler)
     audio_hal_ctrl_codec(main_handler->board_handle->audio_hal, AUDIO_HAL_CODEC_MODE_DECODE, AUDIO_HAL_CTRL_START);
 }
 
-/* Initializes and logs onto the current network */
+//* I didn't write this function *//
 void mainHandler_init_wifi(main_handler_t * main_handler)
 {
     ESP_LOGI(TAG, "[ 1 ] Initialize the tcp/ip adapter");
@@ -70,7 +68,7 @@ void mainHandler_init_config(main_handler_t* main_handler)
     main_handler->config = config;
 }
 
-/* Starts the flash init, needed for wifi */
+//* I didn't write this function *//
 void nvs_init()
 {
     esp_err_t err = nvs_flash_init();

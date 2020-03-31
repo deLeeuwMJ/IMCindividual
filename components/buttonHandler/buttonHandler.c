@@ -1,25 +1,11 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "board.h"
-#include "input_key_service.h"
 #include "buttonHandler.h"
-#include "rlib.h"
-#include "twistre.h"
-#include "radio.h"
 
 #define TAG "BUTTON_HANDLER"
 
 twistre_t twistre;
 SemaphoreHandle_t* mutex;
 
-//* I didn't wrote this function *//
+//* I didn't write this function *//
 static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_service_event_t *evt, void *ctx)
 {
      if (evt->type == INPUT_KEY_SERVICE_ACTION_CLICK) 
@@ -55,12 +41,13 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
     return ESP_OK;
 }
 
+
 void input_mutex_init(main_handler_t* main_handler)
 {
     mutex = &main_handler->mutex;
 }
 
-//* I didn't wrote this function *//
+//* I didn't write this function *//
 void buttonHandler_init(main_handler_t* main_handler)
 {
     ESP_LOGI(TAG, "button_init called");
@@ -96,7 +83,8 @@ void twistre_scroll_handler(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
      
-    while (1) {
+    while (1) 
+    {
         xLastWakeTime = xTaskGetTickCount();
         vTaskDelayUntil(&xLastWakeTime, 250 / portTICK_RATE_MS);
 

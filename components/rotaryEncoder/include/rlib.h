@@ -1,23 +1,15 @@
-
 #ifndef RE_LIB_H
 #define RE_LIB_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "esp_err.h"
 #include "driver/i2c.h"
-#include "freertos/task.h"
 #include "twistre.h"
-#include "stdbool.h"
 
 /*
 
    Function prototypes
    
 */
-
 void rlib_init(twistre_t *rotary);                                      /* Initialize twistre_t */
 bool rlib_is_connected();                                               /* Checks if sensor ack's the I2C request */
 int16_t rlib_get_count();                                               /* Returns the number of indents the user has turned the knob */
@@ -39,12 +31,6 @@ uint8_t rlib_get_red();                                                 /* Get c
 uint8_t rlib_get_green();                                               /* Get current value */
 uint8_t rlib_get_blue();                                                /* Get current value */
 
-/**
-* Connect' commands Set the relation between each color and the twisting of the knob
-* This will connect the LED so it changes [amount] with each encoder tick
-* Negative numbers are allowed (so LED gets brighter the more you turn the encoder down)
-*/
-
 bool rlib_connect_color(int16_t red, int16_t green, int16_t blue);      /* Connect all colors in one command */
 bool rlib_connect_red(int16_t val);                                     /* Connect individual colors */
 bool rlib_connect_green(int16_t val);                                   /* Connect individual colors */
@@ -61,9 +47,5 @@ bool rlib_set_int_timeout(uint16_t timeout);                            /* Set n
 
 uint16_t rlib_get_version();                                            /* Returns a two byte Major/Minor version number */
 void rlib_change_address(uint8_t address);                              /* Change the I2C address to newAddress */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

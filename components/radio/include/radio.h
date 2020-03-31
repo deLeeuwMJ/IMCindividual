@@ -1,7 +1,11 @@
-#ifndef radio_H
-#define radio_H
+#ifndef RADIO_H
+#define RADIO_H
 
 #include "mainHandler.h"
+#include "esp_log.h"
+#include "audio_pipeline.h"
+
+#include "stdbool.h"
 
 /*
    radio_channel_t

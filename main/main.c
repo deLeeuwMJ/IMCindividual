@@ -1,12 +1,7 @@
-#include <stdlib.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
-#include "sdkconfig.h"
+#include "mainHandler.h"
 #include "buttonHandler.h"
 #include "radio.h"
 #include "rotaryLED.h"
-#include "mainHandler.h"
 
 void app_main()
 {

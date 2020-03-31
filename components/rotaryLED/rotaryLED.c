@@ -1,20 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "esp_peripherals.h"
-#include "board.h"
-#include "input_key_service.h"
-#include "../rotaryEncoder/include/rlib.h"
-#include "../rotaryEncoder/include/twistre.h"
 #include "rotaryLED.h"
-#include "mainHandler.h"
 
 #define TAG "ROTARY_LED"
 
@@ -34,10 +18,10 @@ void led_default_state(void* pvParameters)
 {
     xSemaphoreTake((SemaphoreHandle_t) pvParameters, portMAX_DELAY );
 
-    /* led state */
+    /* Led state */
     led_state = LED_ON;
 
-    //Disable change led on rotation
+    //* Disable change led on rotation */
     rlib_connect_color(0x00, 0x00, 0x00); 
 
 	xSemaphoreGive((SemaphoreHandle_t) pvParameters);
@@ -67,5 +51,6 @@ void led_on_off_handler(void* pvParameters)
         
 	    xSemaphoreGive((SemaphoreHandle_t) pvParameters);
     }
+
     vTaskDelete(NULL);
 }

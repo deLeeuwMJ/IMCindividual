@@ -1,10 +1,5 @@
 #include "twistre.h"
 
-#include "driver/gpio.h"
-#include "driver/i2c.h"
-
-#include "esp_log.h"
-
 static const char* TAG = "TWISTRE";
 
 /**
