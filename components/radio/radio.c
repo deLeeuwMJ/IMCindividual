@@ -9,9 +9,7 @@ audio_pipeline_handle_t pipeline;
 audio_element_handle_t http_stream_reader, i2s_stream_writer, mp3_decoder;
 audio_event_iface_handle_t evt;
 TaskHandle_t p_task;
-main_handler_t* ptr_audio_handler;
-int current_channel;
-int current_volume;
+main_handler_t* ptr_main_handler;
 bool change_event;
 bool is_running;
 
@@ -46,14 +44,12 @@ int _http_stream_event_handle(http_stream_event_msg_t *msg)
 }
 
 /* Initialize radio values */
-void radio_init(main_handler_t* audio_handler)
+void radio_init(main_handler_t* main_handler)
 {
-    ptr_audio_handler = audio_handler;
-    current_channel = audio_handler->config.radio_channel;
-    current_volume = audio_handler->config.device_volume;
+    ptr_main_handler = main_handler;
     is_running = false;
 
-    audio_hal_set_volume(ptr_audio_handler->board_handle->audio_hal, current_volume);
+    audio_hal_set_volume(ptr_main_handler->board_handle->audio_hal, ptr_main_handler->config.device_volume);
 }
 
 /* This function restart sthe radio stream in a safe way*/
@@ -98,7 +94,7 @@ void radio_start()
     audio_pipeline_link(pipeline, (const char *[]) {"http",  "mp3", "i2s"}, 3);
 
     ESP_LOGI(TAG, "[3.6] Set up  uri (http as http_stream, mp3 as mp3 decoder, and default output is i2s)");
-    audio_element_set_uri(http_stream_reader, channels[current_channel]);   
+    audio_element_set_uri(http_stream_reader, channels[ptr_main_handler->config.radio_channel]);   
 
     ESP_LOGI(TAG, "[ 4 ] Start audio_pipeline");
     audio_pipeline_run(pipeline);
@@ -109,12 +105,12 @@ void radio_start()
 //* I didn't write this function *//
 void radio_next_channel()
 {
-    ESP_LOGI(TAG, "Current channel %i", current_channel);
+    ESP_LOGI(TAG, "Current channel %i", ptr_main_handler->config.radio_channel);
     
     change_event = true;
-    current_channel = (current_channel + 1) % (sizeof(channels) / sizeof(channels[0])); 
+    ptr_main_handler->config.radio_channel = (ptr_main_handler->config.radio_channel + 1) % (sizeof(channels) / sizeof(channels[0])); 
     
-    ESP_LOGI(TAG, "Next channel %i", current_channel);
+    ESP_LOGI(TAG, "Next channel %i", ptr_main_handler->config.radio_channel);
 
     radio_restart();
 }
@@ -122,12 +118,12 @@ void radio_next_channel()
 //* I didn't write this function *//
 void radio_previous_channel()
 {
-    ESP_LOGI(TAG, "Current channel %i", current_channel);
+    ESP_LOGI(TAG, "Current channel %i", ptr_main_handler->config.radio_channel);
 
     change_event = true;
-    current_channel = (current_channel - 1) % (sizeof(channels) / sizeof(channels[0])); 
+    ptr_main_handler->config.radio_channel = (ptr_main_handler->config.radio_channel - 1) % (sizeof(channels) / sizeof(channels[0])); 
 
-    ESP_LOGI(TAG, "Prev channel %i", current_channel);
+    ESP_LOGI(TAG, "Prev channel %i", ptr_main_handler->config.radio_channel);
 
     radio_restart();
 }
@@ -137,25 +133,25 @@ void radio_stop()
 {
     if (is_running)
     {
-    vTaskDelete(p_task);
+        vTaskDelete(p_task);
 
-    ESP_LOGI(TAG, "[ 7 ] Stop audio_pipeline");
-    audio_pipeline_terminate(pipeline);
+        ESP_LOGI(TAG, "[ 7 ] Stop audio_pipeline");
+        audio_pipeline_terminate(pipeline);
 
-    audio_pipeline_unregister(pipeline, http_stream_reader);
-    audio_pipeline_unregister(pipeline, i2s_stream_writer);
-    audio_pipeline_unregister(pipeline, mp3_decoder);
+        audio_pipeline_unregister(pipeline, http_stream_reader);
+        audio_pipeline_unregister(pipeline, i2s_stream_writer);
+        audio_pipeline_unregister(pipeline, mp3_decoder);
 
-    /* Terminal the pipeline before removing the listener */
-    audio_pipeline_remove_listener(pipeline);
+        /* Terminal the pipeline before removing the listener */
+        audio_pipeline_remove_listener(pipeline);
 
-    /* Release all resources */
-    audio_pipeline_deinit(pipeline);
-    audio_element_deinit(http_stream_reader);
-    audio_element_deinit(i2s_stream_writer);
-    audio_element_deinit(mp3_decoder);
+        /* Release all resources */
+        audio_pipeline_deinit(pipeline);
+        audio_element_deinit(http_stream_reader);
+        audio_element_deinit(i2s_stream_writer);
+        audio_element_deinit(mp3_decoder);
 
-    is_running = false;
+        is_running = false;
     }
 }
 
@@ -165,10 +161,10 @@ void radio_handle_data_task(void* pvParameter)
     TickType_t xLastWakeTime;  
     xLastWakeTime = xTaskGetTickCount();
 
-    vTaskDelayUntil(&xLastWakeTime, 5000 / portTICK_RATE_MS);
-
-    while (1) 
+    while (true) 
     {
+        vTaskDelayUntil(&xLastWakeTime, 50 / portTICK_RATE_MS);
+
         audio_event_iface_msg_t msg;
 
         if (msg.source_type == AUDIO_ELEMENT_TYPE_ELEMENT
@@ -212,9 +208,13 @@ void radio_handle_data_task(void* pvParameter)
 /* Set the device volume based on board input */
 void radio_set_player_volume(int value)
 {   
-    if (current_volume + value >= 0 && current_volume + value <= 100) current_volume = current_volume + value;
+    /* If input value meets the requirements update current volume value */
+    if (ptr_main_handler->config.device_volume + value >= 0 && ptr_main_handler->config.device_volume + value <= 100) 
+    {
+        ptr_main_handler->config.device_volume = ptr_main_handler->config.device_volume + value;
+    } 
     
-    audio_hal_set_volume(ptr_audio_handler->board_handle->audio_hal, current_volume);
+    audio_hal_set_volume(ptr_main_handler->board_handle->audio_hal, ptr_main_handler->config.device_volume);
 
-    ESP_LOGI("DEVICE_VOLUME", "Volume %d", current_volume);
+    ESP_LOGI("DEVICE_VOLUME", "Volume %d", ptr_main_handler->config.device_volume);
 }

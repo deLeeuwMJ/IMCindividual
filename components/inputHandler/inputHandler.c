@@ -84,7 +84,7 @@ void input_twistre_scroll_handler_task(void* pvParameters)
     TickType_t xLastWakeTime;  
     xLastWakeTime = xTaskGetTickCount();
 
-    while (1) 
+    while (true) 
     {
         vTaskDelayUntil(&xLastWakeTime, 250 / portTICK_RATE_MS);
 
