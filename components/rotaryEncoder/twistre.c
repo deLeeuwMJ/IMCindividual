@@ -1,5 +1,8 @@
 #include "twistre.h"
 
+/* This class is generally the same as the MCP example on Blackboard */
+/* I just did a couple of modifications to make it work with the rotary encoder */
+
 static const char* TAG = "TWISTRE";
 
 /**
@@ -53,15 +56,6 @@ twist_err_t twistre_connect_color(twistre_t *re, int16_t red, int16_t green, int
    	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
    	i2c_master_start(cmd);
 
-//   _i2cPort->beginTransmission((uint8_t)_deviceAddress);
-//   _i2cPort->write(TWIST_CONNECT_RED); //Command
-//   _i2cPort->write(red >> 8);          //MSB
-//   _i2cPort->write(red & 0xFF);        //LSB
-//   _i2cPort->write(green >> 8);        //MSB
-//   _i2cPort->write(green & 0xFF);      //LSB
-//   _i2cPort->write(blue >> 8);         //MSB
-//   _i2cPort->write(blue & 0xFF);       //LSB
-
    	i2c_master_write_byte(cmd, re->i2c_addr << 1 | WRITE_BIT, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, TWIST_CONNECT_RED, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, red >> 8, ACK_CHECK_EN);
@@ -70,7 +64,9 @@ twist_err_t twistre_connect_color(twistre_t *re, int16_t red, int16_t green, int
 	i2c_master_write_byte(cmd, green & 0xFF, ACK_CHECK_EN);
 	i2c_master_write_byte(cmd, blue >> 8, ACK_CHECK_EN);
 	i2c_master_write_byte(cmd, blue & 0xFF, ACK_CHECK_EN);
+
    	i2c_master_stop(cmd);
+
   	esp_err_t ret = i2c_master_cmd_begin(re->port, cmd, 1000 / portTICK_RATE_MS);
    	i2c_cmd_link_delete(cmd);
 
@@ -134,7 +130,7 @@ twist_err_t twistre_read_register16(twistre_t *re, encoder_registers_t reg, uint
 	uint8_t LSB = 0x00;
     uint8_t MSB = 0x00;
 
-    //MSB
+    /* MSB */
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (re->i2c_addr << 1), ACK_CHECK_EN);
@@ -150,7 +146,8 @@ twist_err_t twistre_read_register16(twistre_t *re, encoder_registers_t reg, uint
     {
         return TWIST_ERR_FAIL;
     }
-    //LSB
+
+    /* LSB */
     cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (re->i2c_addr << 1), ACK_CHECK_EN);
@@ -185,14 +182,13 @@ bool twistre_write_register(twistre_t *re, encoder_registers_t reg, uint8_t data
    	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
    	i2c_master_start(cmd);
 
-	// _i2cPort->write(addr);
-  	// _i2cPort->write(val);
-
    	i2c_master_write_byte(cmd, re->i2c_addr << 1 | WRITE_BIT, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, data, ACK_CHECK_EN);
+
    	i2c_master_stop(cmd);
-  	 esp_err_t ret = i2c_master_cmd_begin(re->port, cmd, 1000 / portTICK_RATE_MS);
+
+  	esp_err_t ret = i2c_master_cmd_begin(re->port, cmd, 1000 / portTICK_RATE_MS);
    	i2c_cmd_link_delete(cmd);
 
    	if (ret == ESP_FAIL) 
@@ -216,15 +212,13 @@ bool twistre_write_register16(twistre_t *re, encoder_registers_t reg, uint16_t d
    	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
    	i2c_master_start(cmd);
 
-// 	 _i2cPort->write(addr);
-//   _i2cPort->write(val & 0xFF); //LSB
-//   _i2cPort->write(val >> 8);   //MSB
-
    	i2c_master_write_byte(cmd, re->i2c_addr << 1 | WRITE_BIT, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, data & 0xFF, ACK_CHECK_EN);
 	i2c_master_write_byte(cmd, data >> 8, ACK_CHECK_EN);
+
    	i2c_master_stop(cmd);
+
    	esp_err_t ret = i2c_master_cmd_begin(re->port, cmd, 1000 / portTICK_RATE_MS);
    	i2c_cmd_link_delete(cmd);
 
@@ -233,6 +227,7 @@ bool twistre_write_register16(twistre_t *re, encoder_registers_t reg, uint16_t d
       ESP_LOGE(TAG,"ERROR: unable to write to register");
       return false;
    	}
+
    	return true;
 }
 
@@ -248,11 +243,6 @@ bool twistre_write_register24(twistre_t *re, encoder_registers_t reg, uint32_t d
    	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
    	i2c_master_start(cmd);
 
-//   _i2cPort->write(addr);
-//   _i2cPort->write(val >> 16);  //MSB
-//   _i2cPort->write(val >> 8);   //MidMSB
-//   _i2cPort->write(val & 0xFF); //LSB
-
    	i2c_master_write_byte(cmd, re->i2c_addr << 1 | WRITE_BIT, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, reg, ACK_CHECK_EN);
    	i2c_master_write_byte(cmd, data >> 16, ACK_CHECK_EN);
@@ -260,6 +250,7 @@ bool twistre_write_register24(twistre_t *re, encoder_registers_t reg, uint32_t d
 	i2c_master_write_byte(cmd, data & 0xFF, ACK_CHECK_EN);
 
    	i2c_master_stop(cmd);
+
    	esp_err_t ret = i2c_master_cmd_begin(re->port, cmd, 1000 / portTICK_RATE_MS);
    	i2c_cmd_link_delete(cmd);
 	   
@@ -268,5 +259,6 @@ bool twistre_write_register24(twistre_t *re, encoder_registers_t reg, uint32_t d
       ESP_LOGE(TAG,"ERROR: unable to write to register");
       return false;
    	}
+
    	return true;
 }
