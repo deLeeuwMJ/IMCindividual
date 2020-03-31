@@ -27,7 +27,11 @@ typedef struct
     uint8_t blue;
 } rgb_info_t;
 
+/*
 
+   Function prototypes
+   
+*/
 void start_led_tasks(main_handler_t* audio_handler);
 void led_default_state(void* pvParameters);
 void led_on_off_handler(void* pvParameters);

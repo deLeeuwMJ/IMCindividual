@@ -16,9 +16,6 @@
 
 #define TAG "RADIO"
 
-//Prototypes
-void _handle_radio_data_task(void* pvParameters);
-
 //Attributes
 audio_pipeline_handle_t pipeline;
 audio_element_handle_t http_stream_reader, i2s_stream_writer, mp3_decoder;
@@ -114,7 +111,7 @@ void radio_start()
     ESP_LOGI(TAG, "[ 4 ] Start audio_pipeline");
     audio_pipeline_run(pipeline);
 
-    xTaskCreate(&_handle_radio_data_task, "radiotask", 4*1024, NULL, 1, &p_task);
+    xTaskCreate(handle_radio_data_task, "radiotask", 4*1024, NULL, 1, &p_task);
 }
 
 void radio_next_channel()
@@ -167,12 +164,10 @@ void radio_stop()
     }
 }
 
-void _handle_radio_data_task(void* pvParameter)
+void handle_radio_data_task(void* pvParameter)
 {
     TickType_t xLastWakeTime;  
     xLastWakeTime = xTaskGetTickCount();
-
-    menu_update_radio(radio_get_channel_name(current_channel), "");
 
     vTaskDelayUntil(&xLastWakeTime, 5000 / portTICK_RATE_MS);
 

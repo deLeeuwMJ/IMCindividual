@@ -3,6 +3,12 @@
 
 #include "mainHandler.h"
 
+
+/*
+
+   Function prototypes
+   
+*/
 void input_mutex_init(main_handler_t* main_handler);
 void buttonHandler_init(main_handler_t* main_handler);
 void rotary_init(main_handler_t* main_handler);

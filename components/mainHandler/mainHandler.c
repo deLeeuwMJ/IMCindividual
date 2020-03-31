@@ -5,13 +5,6 @@
 
 #define TAG "MAIN_HANDLER"
 
-// Prototypes
-void mainHandler_init_board(main_handler_t * main_handler);
-void mainHandler_init_wifi(main_handler_t * main_handler);
-void mainHandler_init_semaphore(main_handler_t * main_handler);
-void mainHandler_init_config(main_handler_t* main_handler);
-void nvs_init();
-
 /* Initializes the main settings */
 void mainHandler_init(main_handler_t * main_handler)
 {
@@ -31,7 +24,6 @@ void mainHandler_init_board(main_handler_t * main_handler)
 
     ESP_LOGI(TAG, "[1.2] Initialize and start peripherals");
     audio_board_key_init(main_handler->set);
-    audio_board_sdcard_init(main_handler->set);
 
     ESP_LOGI(TAG, "[ 2 ] Start codec chip");
     main_handler->board_handle = audio_board_init();
@@ -72,7 +64,7 @@ void mainHandler_init_semaphore(main_handler_t * main_handler)
 void mainHandler_init_config(main_handler_t* main_handler)
 {
     config_handler_t config = { // Device vol, default radio channel
-        45, 3
+        55, 0
     };
 
     main_handler->config = config;
