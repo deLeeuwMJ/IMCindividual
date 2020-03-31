@@ -8,7 +8,7 @@ void app_main()
     main_handler_t main_config;
 
     /* Initialze configs */
-    mainHandler_init(&main_config);
+    main_handler_init(&main_config);
     input_button_init(&main_config);
     input_mutex_init(&main_config);
     radio_init(&main_config);

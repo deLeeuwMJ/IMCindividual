@@ -35,11 +35,11 @@ typedef struct{
    Function prototypes
    
 */
-void mainHandler_init(main_handler_t * main_handler);
-void mainHandler_init_board(main_handler_t * main_handler);
-void mainHandler_init_wifi(main_handler_t * main_handler);
-void mainHandler_init_semaphore(main_handler_t * main_handler);
-void mainHandler_init_config(main_handler_t* main_handler);
-void nvs_init();
+void main_handler_init(main_handler_t* main_handler);
+void main_handler_init_board(main_handler_t* main_handler);
+void main_handler_init_wifi(main_handler_t* main_handler);
+void main_handler_init_semaphore(main_handler_t* main_handler);
+void main_handler_init_config(main_handler_t* main_handler);
+void main_handler_init_nvs_init();
 
 #endif
