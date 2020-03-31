@@ -5,7 +5,6 @@
 
 #define TAG "RADIO"
 
-//Attributes
 audio_pipeline_handle_t pipeline;
 audio_element_handle_t http_stream_reader, i2s_stream_writer, mp3_decoder;
 audio_event_iface_handle_t evt;
@@ -16,7 +15,7 @@ int current_volume;
 bool change_event;
 bool is_running;
 
-//Pre installed channels
+/* Urls of the available radio stations */
 char channels[4][128] = 
 {
     {"http://playerservices.streamtheworld.com/api/livestream-redirect/RADIO538.mp3"}, //RADIO 538
@@ -46,6 +45,7 @@ int _http_stream_event_handle(http_stream_event_msg_t *msg)
     return ESP_OK;
 }
 
+/* Initialize radio values */
 void radio_init(main_handler_t* audio_handler)
 {
     ptr_audio_handler = audio_handler;
@@ -56,12 +56,14 @@ void radio_init(main_handler_t* audio_handler)
     audio_hal_set_volume(ptr_audio_handler->board_handle->audio_hal, current_volume);
 }
 
+/* This function restart sthe radio stream in a safe way*/
 void radio_restart()
 {
     radio_stop();
     radio_start();
 }
 
+/* This will setup a pipeline for the radio to use and creates a task to read the incoming data */
 void radio_start()
 {
     change_event = false;
@@ -101,9 +103,10 @@ void radio_start()
     ESP_LOGI(TAG, "[ 4 ] Start audio_pipeline");
     audio_pipeline_run(pipeline);
 
-    xTaskCreate(handle_radio_data_task, "radiotask", 4*1024, NULL, 1, &p_task);
+    xTaskCreate(radio_handle_data_task, "radiotask", 4*1024, NULL, 1, &p_task);
 }
 
+//* I didn't write this function *//
 void radio_next_channel()
 {
     ESP_LOGI(TAG, "Current channel %i", current_channel);
@@ -116,6 +119,7 @@ void radio_next_channel()
     radio_restart();
 }
 
+//* I didn't write this function *//
 void radio_previous_channel()
 {
     ESP_LOGI(TAG, "Current channel %i", current_channel);
@@ -128,6 +132,7 @@ void radio_previous_channel()
     radio_restart();
 }
 
+/* This will delete the task and remove all related created pipelines */
 void radio_stop()
 {
     if (is_running)
@@ -154,7 +159,8 @@ void radio_stop()
     }
 }
 
-void handle_radio_data_task(void* pvParameter)
+/* This task will handle the data coming in and playing from the selected stream*/
+void radio_handle_data_task(void* pvParameter)
 {
     TickType_t xLastWakeTime;  
     xLastWakeTime = xTaskGetTickCount();
@@ -203,28 +209,12 @@ void handle_radio_data_task(void* pvParameter)
     }
 }
 
-void radio_set_player_volume(int val)
+/* Set the device volume based on board input */
+void radio_set_player_volume(int value)
 {   
-    if (current_volume + val >= 0 && current_volume + val <= 100) current_volume = current_volume + val;
+    if (current_volume + value >= 0 && current_volume + value <= 100) current_volume = current_volume + value;
     
     audio_hal_set_volume(ptr_audio_handler->board_handle->audio_hal, current_volume);
 
     ESP_LOGI("DEVICE_VOLUME", "Volume %d", current_volume);
-}
-
-char* radio_get_channel_name(int channel)
-{
-    switch (channel)
-    {
-    case RADIO_538:
-        return "> Radio 538";
-    case RADIO_SKY:
-        return "> Sky Radio";
-    case RADIO_100:
-        return "> 100 procent NL";
-    case RADIO_SLAM:
-        return "> Slam hardstyle";
-    default:
-        return "No channel found!";
-    }
 }

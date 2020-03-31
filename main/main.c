@@ -1,5 +1,5 @@
 #include "mainHandler.h"
-#include "buttonHandler.h"
+#include "inputHandler.h"
 #include "radio.h"
 #include "rotaryLED.h"
 
@@ -9,13 +9,13 @@ void app_main()
 
     /* Initialze configs */
     mainHandler_init(&main_config);
-    buttonHandler_init(&main_config);
+    input_button_init(&main_config);
     input_mutex_init(&main_config);
     radio_init(&main_config);
-    rotary_init(&main_config);
+    input_rotary_init(&main_config);
 
     /* Start all task related to Rotary Encoder RGB Light */
-    start_led_tasks(&main_config);
+    roled_start_tasks(&main_config);
 
     /* Start radio */
     radio_start();

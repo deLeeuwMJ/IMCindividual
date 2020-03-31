@@ -4,8 +4,10 @@
 #include "mainHandler.h"
 #include "esp_log.h"
 #include "audio_pipeline.h"
-
 #include "stdbool.h"
+
+#define RADIO_UP 5
+#define RADIO_DOWN -5
 
 /*
    radio_channel_t
@@ -25,15 +27,13 @@ typedef enum
    Function prototypes
    
 */
-void radio_init(main_handler_t* audio_handler);
+void radio_init(main_handler_t* main_handler);
 void radio_start();
 void radio_restart();
 void radio_stop();
 void radio_next_channel();
 void radio_previous_channel();
-void radio_set_player_volume(int);
-void radio_is_player_muted(bool);
-char* radio_get_channel_name(int channel);
-void handle_radio_data_task(void* pvParameters);
+void radio_set_player_volume(int value);
+void radio_handle_data_task(void* pvParameters);
 
 #endif

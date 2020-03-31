@@ -1,8 +1,8 @@
-#include "buttonHandler.h"
+#include "inputHandler.h"
 
-#define TAG "BUTTON_HANDLER"
+#define TAG "INPUT_HANDLER"
 
-twistre_t twistre;
+twistre_t twistre; /* This needs to be a global variable otherwise the program will crash or create a I2C number error */
 SemaphoreHandle_t* mutex;
 
 //* I didn't write this function *//
@@ -29,11 +29,11 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
                 break;   
             case 5:             //vol down
                 ESP_LOGI(TAG, "[ * ] VOL DOWN PRESSED");
-                radio_set_player_volume(-5);
+                radio_set_player_volume(RADIO_DOWN);
                 break;
             case 6:             //vol up
                 ESP_LOGI(TAG, "[ * ] VOL UP PRESSED");
-                radio_set_player_volume(5);
+                radio_set_player_volume(RADIO_UP);
                 break;
             }
         xSemaphoreGive(*mutex);
@@ -41,14 +41,14 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
     return ESP_OK;
 }
 
-
+/* Initializes main mutex used to prevent errors pressing multiple buttons */
 void input_mutex_init(main_handler_t* main_handler)
 {
     mutex = &main_handler->mutex;
 }
 
 //* I didn't write this function *//
-void buttonHandler_init(main_handler_t* main_handler)
+void input_button_init(main_handler_t* main_handler)
 {
     ESP_LOGI(TAG, "button_init called");
     input_key_service_info_t input_key_info[] = INPUT_KEY_DEFAULT_INFO();
@@ -58,9 +58,9 @@ void buttonHandler_init(main_handler_t* main_handler)
 }
 
 /* Initializes the Rotary Encoder */
-void rotary_init(main_handler_t* main_handler)
+void input_rotary_init(main_handler_t* main_handler)
 {
-    /* Initialize I2C bus for TWIST RE */
+    /* Initialize config values for TWIST RE */
 	twistre.i2c_addr = QWIIC_TWIST_ADDR;
 	twistre.sda_pin = 18;
 	twistre.scl_pin = 23;
@@ -68,24 +68,24 @@ void rotary_init(main_handler_t* main_handler)
 	twistre.sda_pullup_en = GPIO_PULLUP_ENABLE;
 	twistre.scl_pullup_en = GPIO_PULLUP_ENABLE;
 
-	/* init rotary encoder */
+	/* Init rotary encoder */
 	rlib_init(&twistre);
 
     /* start tasks and check if device is connected */
     if (rlib_is_connected() == true)
     {
-        xTaskCreate(twistre_scroll_handler, "twistre_scroll_handler", 3*1024, NULL, 3, NULL);
+        xTaskCreate(input_twistre_scroll_handler_task, "twistre_scroll_handler_task", 3*1024, NULL, 3, NULL);
     }
 }
 
-/* Task which constantly checks the state of the rotary encoder and acts based on values */
-void twistre_scroll_handler(void* pvParameters)
+/* Task which constantly checks the state of the rotary encoder and acts based off the state */
+void input_twistre_scroll_handler_task(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
-     
+    xLastWakeTime = xTaskGetTickCount();
+
     while (1) 
     {
-        xLastWakeTime = xTaskGetTickCount();
         vTaskDelayUntil(&xLastWakeTime, 250 / portTICK_RATE_MS);
 
         xSemaphoreTake(*mutex, ( TickType_t ) portMAX_DELAY );
@@ -107,5 +107,4 @@ void twistre_scroll_handler(void* pvParameters)
 
 	    xSemaphoreGive(*mutex);
     }
-    vTaskDelete(NULL);
 }

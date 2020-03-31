@@ -1,5 +1,5 @@
-#ifndef ROTARYLED_H
-#define ROTARYLED_H
+#ifndef ROTARY_LED_H
+#define ROTARY_LED_H
 
 #include "mainHandler.h"
 #include "rlib.h"
@@ -12,8 +12,7 @@
 typedef enum 
 {
    LED_ON           = 0x00,
-   LED_SUNRISE      = 0x01,
-   LED_OFF          = 0x02
+   LED_OFF          = 0x01
 } led_state_t;
 
 /*
@@ -33,7 +32,7 @@ typedef struct
    Function prototypes
    
 */
-void start_led_tasks(main_handler_t* audio_handler);
-void led_default_state(void* pvParameters);
-void led_on_off_handler(void* pvParameters);
+void roled_start_tasks(main_handler_t* main_handler);
+void roled_on_off_handler_task(void* pvParameters);
+
 #endif
