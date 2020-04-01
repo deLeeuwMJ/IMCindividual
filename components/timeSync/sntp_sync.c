@@ -7,11 +7,11 @@
 
 static const char *TAG = "SNTP";
 
-//Prototypes
+//* I didn't write this function *//
 static void obtain_time(void);
 static void initialize_sntp(void);
 
-/* Synchronize the time with amsterdam */
+//* I didn't write this function *//
 void sntp_sync(sntp_sync_time_cb_t callback) 
 {
 	
@@ -37,7 +37,7 @@ void sntp_sync(sntp_sync_time_cb_t callback)
     }
 }
 
-/* Obtain SNTP time */
+//* I didn't write this function *//
 static void obtain_time(void)
 {
     initialize_sntp();
@@ -55,7 +55,7 @@ static void obtain_time(void)
     localtime_r(&now, &timeinfo);
 }
 
-/* Set synchronisation settings */
+//* I didn't write this function *//
 static void initialize_sntp(void) 
 {
 	

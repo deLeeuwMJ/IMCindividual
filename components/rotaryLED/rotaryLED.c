@@ -57,6 +57,7 @@ void roled_on_off_handler_task(void* pvParameters)
     }
 }
 
+/* This task checks if a certain time (power_time) has passed and if that's true, it will trigger a event */
 void roled_power_event_handler_task(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
@@ -71,24 +72,29 @@ void roled_power_event_handler_task(void* pvParameters)
         if (led_state == LED_ON)
         {
             simple_time_t current_time = clock_handler_get_time();
+
+            /* Calculate difference in seconds between current time and power time */
             double seconds = clock_handler_calculate_time_difference_(current_time, ptr_main_handler->config.power_time);
 
+            /* If it reached the power time, it will change the current state to off */
             if (seconds == 0)
             {
                 led_state = LED_OFF;
             }
         }
+
 	    xSemaphoreGive((SemaphoreHandle_t) pvParameters);
     }
 }
 
+/* This task checks if a certain time (alarm_time) has passed a minimal difference, based on that difference, it will decide the LED color */
 void roled_sunrise_event_handler_task(void* pvParameters)
 {
     TickType_t xLastWakeTime;  
     xLastWakeTime = xTaskGetTickCount();
 
-    // Min diff sunrise start
-    int time_before_alarm = 10 * 6; // seconds
+    /* Minimal difference to start the sunrise simulation */
+    int time_before_alarm = 60;
     int arr_index = 0;
      
     while (true) 
@@ -98,10 +104,14 @@ void roled_sunrise_event_handler_task(void* pvParameters)
         xSemaphoreTake((SemaphoreHandle_t) pvParameters, portMAX_DELAY );
 
         simple_time_t current_time = clock_handler_get_time();
+
+        /* Calculate difference in seconds between current time and alarm time */
         double seconds = clock_handler_calculate_time_difference_(current_time, ptr_main_handler->config.alarm_time);
 
+        /* Depending on the state the LED is in it will perform a certain action */
         if (led_state == LED_OFF)
         {
+            /* Change the current LED state to sunrise */
             if (time_before_alarm == seconds)
             {
                 led_state = LED_SUNRISE;
@@ -109,16 +119,20 @@ void roled_sunrise_event_handler_task(void* pvParameters)
         } 
         else if (led_state == LED_SUNRISE)
         {
+            /* Every 6 seconds it will update the current index for the sun color array */
             if((int)seconds % 6 == 0) arr_index++;
 
+            /* Based of the current index it will choose the correct RGB values */
             rlib_set_color(sun_colors[arr_index].red, sun_colors[arr_index].green, sun_colors[arr_index].blue);
 
-            if (seconds == 1) // 0 doesn't work in this case > other functions
+            /* One second before it reached it's time, the LED state changes back to normal and the array index gets reset  */
+            if (seconds == 1) /* Using 0 here doesn't work, it will block other functions, because of the use of a mutex */
             {
                 led_state = LED_ON;
                 arr_index = 0;
             }
         }
+
 	    xSemaphoreGive((SemaphoreHandle_t) pvParameters);
     }
 }
