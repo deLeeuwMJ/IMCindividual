@@ -2,6 +2,7 @@
 #include "inputHandler.h"
 #include "radio.h"
 #include "rotaryLED.h"
+#include "clockHandler.h"
 
 void app_main()
 {
@@ -12,6 +13,7 @@ void app_main()
     input_button_init(&main_config);
     input_mutex_init(&main_config);
     input_rotary_init(&main_config);
+    clock_handler_init(&main_config);
     radio_init(&main_config);
     roled_init(&main_config);
 

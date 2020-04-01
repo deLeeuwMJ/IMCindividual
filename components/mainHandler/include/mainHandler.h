@@ -8,6 +8,28 @@
 #include "periph_wifi.h"
 
 /*
+   simple_time_t
+   
+   Struct that contains time information
+*/
+typedef struct {
+    int hours;
+    int minutes;
+    int seconds;
+} simple_time_t;
+
+/*
+   simple_date_t
+   
+   Struct that contains date information
+*/
+typedef struct {
+    int year;
+    int month;
+    int day;
+} simple_date_t;
+
+/*
    config_handler_t
    
    Contains key and value items for different components to use
@@ -15,6 +37,8 @@
 typedef struct{
    int device_volume;
    int radio_channel;
+   simple_time_t alarm_time;
+   simple_time_t power_time;
 } config_handler_t;
 
 /*
