@@ -31,7 +31,8 @@ void timer_1_sec_callback( TimerHandle_t xTimer )
 }
 
 /* Get converted curent date in simple_date_t */
-simple_date_t clock_handler_get_date(){
+simple_date_t clock_handler_get_date()
+{
     simple_date_t current_date;
 
     current_date.year = (timeinfo.tm_year + 1900); /* Documentation: years since 1900 */
@@ -47,7 +48,8 @@ simple_date_t clock_handler_get_date(){
 }
 
 /* Get converted curent time in simple_time_t */
-simple_time_t clock_handler_get_time(){
+simple_time_t clock_handler_get_time()
+{
     simple_time_t current_time;
 
     current_time.hours = timeinfo.tm_hour;

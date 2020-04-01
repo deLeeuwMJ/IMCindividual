@@ -12,7 +12,8 @@
    
    Struct that contains time information
 */
-typedef struct {
+typedef struct 
+{
     int hours;
     int minutes;
     int seconds;
@@ -23,7 +24,8 @@ typedef struct {
    
    Struct that contains date information
 */
-typedef struct {
+typedef struct 
+{
     int year;
     int month;
     int day;
@@ -34,7 +36,8 @@ typedef struct {
    
    Contains key and value items for different components to use
 */
-typedef struct{
+typedef struct
+{
    int device_volume;
    int radio_channel;
    simple_time_t alarm_time;
@@ -46,7 +49,8 @@ typedef struct{
    
    Contains all used handles, resource mutex and global config
 */
-typedef struct{
+typedef struct
+{
    esp_periph_set_handle_t set;
    audio_board_handle_t board_handle;
    esp_periph_handle_t wifi_handler;

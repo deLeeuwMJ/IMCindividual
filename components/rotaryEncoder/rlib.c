@@ -1,3 +1,8 @@
+/*
+    I made this class to talk with the rotary encoder with help of the Qwiic Twist Register Map
+    Link: https://cdn.sparkfun.com/assets/learn_tutorials/8/4/6/Qwiic_Twist_Register_Map_-_Fixed_Endianness.pdf
+*/
+
 #include "rlib.h"
 
 int16_t last_count = 0xFF;
