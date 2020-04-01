@@ -20,7 +20,8 @@ typedef enum
    Function prototypes
    
 */
-void roled_start_tasks(main_handler_t* main_handler);
+void roled_init(main_handler_t* main_handler);
+void roled_start_tasks();
 void roled_on_off_handler_task(void* pvParameters);
 
 #endif
