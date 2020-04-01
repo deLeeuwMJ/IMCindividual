@@ -1,23 +1,12 @@
-#include <string.h>
-
-#include "esp_wifi.h"
-#include "freertos/task.h"
-
-#include "esp_peripherals.h"
-#include "periph_sdcard.h"
-#include "periph_touch.h"
-#include "periph_wifi.h"
-
-#include "sntp_sync.h"
-#include <time.h>
-#include "mainHandler.h"
 #include "clockHandler.h"
+#include "sntp_sync.h"
 
 static const char *TAG = "CLOCK_HANDLER";
 
 TimerHandle_t timer_1_sec;
 struct tm timeinfo; 
 
+//* I didn't write this function *//
 void stmp_timesync_event(struct timeval *tv)
 {
     ESP_LOGI(TAG, "Notification of a time synchronization event");
@@ -32,6 +21,7 @@ void stmp_timesync_event(struct timeval *tv)
     ESP_LOGI(TAG, "The current date/time in Amsterdam is: %s", strftime_buf);
 }
 
+//* I didn't write this function *//
 void timer_1_sec_callback( TimerHandle_t xTimer )
 { 
 	/* Update time */
@@ -40,15 +30,15 @@ void timer_1_sec_callback( TimerHandle_t xTimer )
 	localtime_r(&now, &timeinfo);
 }
 
-
+/* Get converted curent date in simple_date_t */
 simple_date_t clock_handler_get_date(){
     simple_date_t current_date;
 
-    current_date.year = (timeinfo.tm_year + 1900); //years since 1900
+    current_date.year = (timeinfo.tm_year + 1900); /* Documentation: years since 1900 */
     current_date.month = timeinfo.tm_mon;
     current_date.day = timeinfo.tm_mday;
 
-    // For testing purposes
+    /* Only for testing purposes, to make it easier to test */
     // current_date.year = 2020;
     // current_date.month = 12;
     // current_date.day = 5;
@@ -56,6 +46,7 @@ simple_date_t clock_handler_get_date(){
     return current_date; 
 }
 
+/* Get converted curent time in simple_time_t */
 simple_time_t clock_handler_get_time(){
     simple_time_t current_time;
 
@@ -63,7 +54,7 @@ simple_time_t clock_handler_get_time(){
     current_time.minutes = timeinfo.tm_min;
     current_time.seconds = timeinfo.tm_sec;
 
-    // For testing purposes
+    /* Only for testing purposes, to make it easier to test */
     // current_time.hours = 23;
     // current_time.minutes = 30;
     // current_time.seconds = 0;
@@ -71,13 +62,16 @@ simple_time_t clock_handler_get_time(){
     return current_time; 
 }
 
+//* I didn't write this function *//
 void clock_handler_stop_task()
 {
     xTimerDelete(timer_1_sec,10); 
 }
 
+/* Calculates the difference between to simple_time_t in seconds */
 double clock_handler_calculate_time_difference_(simple_time_t begin, simple_time_t end)
 {
+    /* Convert simple_time_t type in time_t type to make them work with c difftime(time_t time1, time_t time2) */
     struct tm bt = { 0 };
 
     bt.tm_hour = begin.hours;
@@ -96,9 +90,11 @@ double clock_handler_calculate_time_difference_(simple_time_t begin, simple_time
     time_t begin_time = mktime( &bt );
     time_t end_time = mktime( &et );
 
+    /* With the use of the converted type, calculate difference in seconds*/
     return difftime( end_time, begin_time );
 }
 
+//* I didn't write this function *//
 void clock_handler_init(main_handler_t* mainHandler)
 {
 	/* Synchronize NTP time */

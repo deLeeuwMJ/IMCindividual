@@ -1,7 +1,7 @@
 #include "twistre.h"
 
 /* This class is generally the same as the MCP example on Blackboard */
-/* I just did a couple of modifications to make it work with the rotary encoder */
+/* I just did a couple of modifications and added extra functions to make it work with the rotary encoder */
 
 static const char* TAG = "TWISTRE";
 
